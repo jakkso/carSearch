@@ -1,0 +1,164 @@
+
+base_url = f'https://{city_name}.craigslist.org/search/{owner_type}?' + options separated by &
+
+all / owner / dealer
+all=cta / owner=cto / dealer=ctd
+
+titles only
+srchType=T
+
+has images
+hasPic=1
+
+posted today
+postedToday=1
+
+bundled duplicates
+bundleDuplicates=1
+
+RSS feed
+format=rss
+
+crypto ok
+crypto_currency_ok=1
+
+include nearby areas
+searchNearby=1
+
+__ miles from __ zip
+search_distance=$NUM_MILES
+postal=$ZIP_CODE
+
+price min
+min_price=$MIN
+
+price max
+max_price=$MAX
+
+make / model
+auto_make_model=SEARCH+TERMS+HERE+SEP+BY+'\+'
+
+model year min
+min_auto_year=$YEAR
+
+model year max
+max_auto_year=$YEAR
+
+odo min
+min_auto_miles=$MIN
+
+odo max
+max_auto_miles=$MAX
+
+condition
+new: condition=10
+like new: condition=20
+excellent: condition=30
+good: condition=40
+fair: condition=50
+salvage: condition=60
+
+cylinders
+3: auto_cylinders=1
+4: auto_cylinders=2
+5: auto_cylinders=3
+6: auto_cylinders=4
+8: auto_cylinders=5
+10: auto_cylinders=6
+12: auto_cylinders=7
+other: auto_cylinders=8
+
+drive
+fwd: auto_drivetrain=1
+rwd: auto_drivetrain=2
+4wd: auto_drivetrain=3
+
+fuel
+gas: auto_fuel_type=1
+diesel: auto_fuel_type=2
+hybrid: auto_fuel_type=3
+electric: auto_fuel_type=4
+other: auto_fuel_type=6
+
+color
+black: auto_paint=1
+blue: auto_paint=2
+brown: auto_paint=20
+green: auto_paint=3
+grey: auto_paint=4
+orange: auto_paint=5
+purple: auto_paint=6
+red: auto_paint=7
+silver: auto_paint=8
+white: auto_paint=9
+yellow: auto_paint=10
+custom: auto_paint=11
+
+size
+compact: auto_size=1
+full-size: auto_size=2
+mid-size: auto_size=3
+sub-compact: auto_size=4
+
+title status
+clean: auto_title_status=1
+salvage: auto_title_status=2
+rebuilt: auto_title_status=3
+parts-only: auto_title_status=4
+lien: auto_title_status=5
+missing: auto_title_status=6
+
+transmission
+manual: auto_transmission=1
+automatic: auto_transmission=2
+other: auto_transmission=3
+
+type
+bus: auto_bodytype=1
+convertible: auto_bodytype=2
+coupe: auto_bodytype=3
+hatchback: auto_bodytype=4
+mini-van: auto_bodytype=5
+offroad: auto_bodytype=6
+pickup: auto_bodytype=7
+sedan: auto_bodytype=8
+truck: auto_bodytype=9
+SUV: auto_bodytype=10
+wagon: auto_bodytype=11
+van: auto_bodytype=12
+other: auto_bodytype=13
+
+
+FP Entry Example
+{
+    'id': 'https://fortcollins.craigslist.org/ctd/d/2015-volkswagen-golf-gti/6510955922.html',
+    'title': '2015 *Volkswagen Golf GTI* hatchback 2.0T SE - Deep Black (Volkswagen_ Golf_ GTI_ hatchback_) &#x0024;18374',
+    'title_detail': {'type': 'text/html',
+                     'language': None,
+                     'base': 'https://denver.craigslist.org/search/cta?format=rss&bundleDuplicates=1&searchNearby=1&min_auto_year=2015&max_auto_miles=30000&auto_make_model=GTI&max_price=20000&auto_transmission=1&search_distance=150&postal=80013',
+                     'value': '2015 *Volkswagen Golf GTI* hatchback 2.0T SE - Deep Black (Volkswagen_ Golf_ GTI_ hatchback_) &#x0024;18374'},
+    'links': [{'rel': 'alternate',
+               'type': 'text/html',
+               'href': 'https://fortcollins.craigslist.org/ctd/d/2015-volkswagen-golf-gti/6510955922.html'}],
+    'link': 'https://fortcollins.craigslist.org/ctd/d/2015-volkswagen-golf-gti/6510955922.html',
+    'summary': '2015 *Volkswagen Golf GTI* 2.0T SE - (Deep Black Pearl) - STOCK#: 173221A \nAvailable at: Greeley Nissan ☎ Phone: *** ext: 0141 \nHablamos Español \nStock #: \xa0\xa0\xa0 173221A \nYear: \xa0\xa0\xa02015 \nMake: \xa0\xa0\xa0Volkswagen \nModel: \xa0\xa0\xa0Golf GTI \nSeries \xa0\xa0 ...',
+    'summary_detail': {'type': 'text/html',
+                       'language': None,
+                       'base': 'https://denver.craigslist.org/search/cta?format=rss&bundleDuplicates=1&searchNearby=1&min_auto_year=2015&max_auto_miles=30000&auto_make_model=GTI&max_price=20000&auto_transmission=1&search_distance=150&postal=80013',
+                       'value': '2015 *Volkswagen Golf GTI* 2.0T SE - (Deep Black Pearl) - STOCK#: 173221A \nAvailable at: Greeley Nissan ☎ Phone: *** ext: 0141 \nHablamos Español \nStock #: \xa0\xa0\xa0 173221A \nYear: \xa0\xa0\xa02015 \nMake: \xa0\xa0\xa0Volkswagen \nModel: \xa0\xa0\xa0Golf GTI \nSeries \xa0\xa0 ...'},
+    'updated': '2018-02-26T11:24:55-07:00',
+    'updated_parsed': time.struct_time(tm_year=2018, tm_mon=2, tm_mday=26, tm_hour=18, tm_min=24, tm_sec=55, tm_wday=0, tm_yday=57, tm_isdst=0),
+    'language': 'en-us',
+    'rights': 'copyright 2018 craigslist',
+    'rights_detail': {'type': 'text/plain',
+                      'language': None,
+                      'base': 'https://denver.craigslist.org/search/cta?format=rss&bundleDuplicates=1&searchNearby=1&min_auto_year=2015&max_auto_miles=30000&auto_make_model=GTI&max_price=20000&auto_transmission=1&search_distance=150&postal=80013',
+                      'value': 'copyright 2018 craigslist'},
+    'dc_source': 'https://fortcollins.craigslist.org/ctd/d/2015-volkswagen-golf-gti/6510955922.html',
+    'dc_type': 'text',
+    'enc_enclosure': {'resource': 'https://images.craigslist.org/00k0k_3cwQhtQXsHV_300x300.jpg',
+                      'type': 'image/jpeg'},
+    'published': '2018-02-26T11:24:55-07:00',
+    'published_parsed': time.struct_time(tm_year=2018, tm_mon=2, tm_mday=26, tm_hour=18, tm_min=24, tm_sec=55, tm_wday=0, tm_yday=57, tm_isdst=0)
+}
+

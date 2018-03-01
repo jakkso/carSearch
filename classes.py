@@ -75,7 +75,7 @@ class Feed:
 
     def load_dict(self):
         files = [path.join(path.dirname(__file__), item) for item in
-                 listdir(path.dirname(self.dict_file))]
+                 listdir(path.dirname(__file__))]
         if self.dict_file not in files:
             return {}
         else:

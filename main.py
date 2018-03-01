@@ -3,8 +3,8 @@ from os import path
 from classes import Feed, Message
 
 
-USER = 'Alex'
-EMAIL_ADDRESS = 'mellandru@gmail.com'
+USER = 'Mike'
+EMAIL_ADDRESS = 'pgmike@gmail.com'
 DATABASE = path.join(path.dirname(__file__), 'data.db')
 DICT_FILE = path.join(path.dirname(__file__), 'feed_dict.p')
 URL = 'https://denver.craigslist.org/search/cta?format=rss&bundleDuplicates=1&' \

@@ -163,6 +163,22 @@ class TestUrl(Base):
         options = classes.CTOptions(static, var).options_list
         self.assertEqual(test_value, options)
 
+        static = []
+        test_value = ['min_auto_year=2015', 'postal_code=80537', 'search_distance=500',
+                      'max_price=20000', 'max_miles=30000']
+        options = classes.CTOptions(static, var).options_list
+        self.assertEqual(test_value, options)
+
+        var = []
+        test_value = []
+        options = classes.CTOptions(static, var).options_list
+        self.assertEqual(test_value, options)
+
+        static = ['has_images']
+        test_value = ['hasPic=1']
+        options = classes.CTOptions(static, var).options_list
+        self.assertEqual(options, test_value)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -181,7 +181,7 @@ class Url:
         """
         assert(city is not None and city.strip() != '')
         assert(category is not None and category.strip() != '')
-        assert(item_name is not None and item_name.strip() != '')
+        assert(item_name is not None)
 
         self.city = city.strip()
         self.category = category.strip()
@@ -214,6 +214,10 @@ class CarTruck(Url):
 
         self.options = self.options_maker(options)
         self.url = self.url_maker()
+
+    @property
+    def get_url(self):
+        return self.url
 
     def __repr__(self):
         return f'CarTruck({self.city}, {self.category}, {self.item_name}, *{self.options})'
@@ -363,14 +367,14 @@ class CTOptions:
                     opt, value = option
                     if opt in self.nested_static:
                         options.append(self.nested_static[opt][value])
-                except ValueError as e:
-                    print(f'Error: {e}.  \nPassing')
+                except ValueError:
+                    pass
 
         for option in self.var:
             try:
                 opt, amount = option
                 if opt in self.var_opt:
                     options.append(self.opt_builder(opt, amount))
-            except ValueError as e:
-                print(f'Error: {e}. \nPassing')
+            except ValueError:
+                pass
         return options

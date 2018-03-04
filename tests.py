@@ -115,16 +115,53 @@ class TestUrl(Base):
         denver = classes.CarTruck('denver', 'cta', 'GTI', *opt)
         self.assertEqual(denver.url, 'https://denver.craigslist.org/search/cta'
                                      '?format=rss&searchNearby=1&max_price=200'
-                                     '00&auto_transmission=1&auto_make_model=GTI')
+                                     '00&auto_transmission=1&auto_make_model=G'
+                                     'TI')
         denver = classes.CarTruck('denver', 'cta', 'GTI ', *opt)
         self.assertEqual(denver.url, 'https://denver.craigslist.org/search/cta'
                                      '?format=rss&searchNearby=1&max_price=200'
-                                     '00&auto_transmission=1&auto_make_model=GTI')
+                                     '00&auto_transmission=1&auto_make_model=G'
+                                     'TI')
         denver = classes.CarTruck('denver', 'cta', 'volkswagen GTI', *opt)
         self.assertEqual(denver.url, 'https://denver.craigslist.org/search/cta'
                                      '?format=rss&searchNearby=1&max_price=200'
                                      '00&auto_transmission=1&auto_make_model=v'
                                      'olkswagen+GTI')
+        denver = classes.CarTruck('denver', 'cta', 'GTI', [])
+        self.assertEqual(denver.url, 'https://denver.craigslist.org/search/cta'
+                                     '?format=rss&searchNearby=1&auto_make_mod'
+                                     'el=GTI')
+        denver = classes.CarTruck('denver', 'cta', 'GTI', ['auto_transmission=1'])
+        self.assertEqual(denver.url, 'https://denver.craigslist.org/search/cta'
+                                     '?format=rss&searchNearby=1&auto_transmis'
+                                     'sion=1&auto_make_model=GTI')
+
+    def test_ctoptions(self):
+        static = [
+            'posted_today',
+            'has_images',
+            ('size', 'compact'),
+            ('type', 'bus')
+        ]
+
+        var = [
+            ('min_auto_year', 2015),
+            ('postal_code', 80537),
+            ('search_distance', 500),
+            ('max_price', 20000),
+            ('max_miles', 30000)
+        ]
+        options = classes.CTOptions(static, var).options_list
+        test_value = ['postToday=1', 'hasPic=1', 'auto_size=1', 'auto_bodytype=1',
+                      'min_auto_year=2015', 'postal_code=80537', 'search_distance=500',
+                      'max_price=20000', 'max_miles=30000']
+        self.assertEqual(options, test_value)
+
+        static.append('nonsense Value')
+        var.append(('pfft', 200))
+        var.append('pfft')
+        options = classes.CTOptions(static, var).options_list
+        self.assertEqual(test_value, options)
 
 
 if __name__ == '__main__':

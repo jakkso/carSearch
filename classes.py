@@ -185,7 +185,7 @@ class Url:
 
         self.city = city.strip()
         self.category = category.strip()
-        self.item_name = self.item_name_maker(item_name)
+        self.item_name = '+'.join(item_name.split())
 
         self.url = f'https://{city}.craigslist.org/search/{category}?' \
                    f'format=rss&searchNearby=1'
@@ -198,10 +198,6 @@ class Url:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
-
-    @staticmethod
-    def item_name_maker(item_name):
-        return '+'.join(item_name.split())
 
 
 class CarTruck(Url):
@@ -216,15 +212,165 @@ class CarTruck(Url):
         Url.__init__(self, city, category, item_name)
         assert item_name is not None
 
-        self.options = options
+        self.options = self.options_maker(options)
         self.url = self.url_maker()
 
     def __repr__(self):
         return f'CarTruck({self.city}, {self.category}, {self.item_name}, *{self.options})'
 
+    @staticmethod
+    def options_maker(options):
+        if len(options) > 1:
+            return options
+        elif len(options) == 1 and options[0] != [] and options[0][0].strip() != '':
+            return options[0]
+        else:
+            return []
+
     def url_maker(self):
-        opt = '&'.join([self.url, '&'.join(self.options)])
-        if self.item_name.strip() != '':
+        if len(self.options) > 1:
+            opt = '&'.join([self.url, '&'.join(self.options)])
+        elif len(self.options) == 1 and self.options[0] != []:
+            opt = f'{self.url}&{self.options[0]}'
+        else:
+            opt = self.url
+        if self.item_name != '':
             return opt + f'&auto_make_model={self.item_name}'
         else:
             return opt
+
+
+class CTOptions:
+    flat_static = {
+        'crypto': 'crypto_currency_ok=1',
+        'posted_today': 'postToday=1',
+        'bundled_duplicates': 'bundleDuplicates=1',
+        'has_images': 'hasPic=1',
+        'titles_only': 'srchType=T',
+    }
+    nested_static = {
+        'condition': {
+            'new': 'condition=10',
+            'like new': 'condition=20',
+            'excellent': 'condition=30',
+            'good': 'condition=40',
+            'fair': 'condition=50',
+            'salvage': 'condition=60'},
+        'cylinders': {
+            '3': 'auto_cylinders=1',
+            '4': 'auto_cylinders=2',
+            '5': 'auto_cylinders=3',
+            '6': 'auto_cylinders=4',
+            '8': 'auto_cylinders=5',
+            '10': 'auto_cylinders=6',
+            '12': 'auto_cylinders=7',
+            'other': 'auto_cylinders=8'},
+        'drive': {
+            'fwd': 'auto_drivetrain=1',
+            'rwd': 'auto_drivetrain=2',
+            '4wd': 'auto_drivetrain=3'},
+        'fuel': {
+            'gas': 'auto_fuel_type=1',
+            'diesel': 'auto_fuel_type=2',
+            'hybrid': 'auto_fuel_type=3',
+            'electric': 'auto_fuel_type=4',
+            'other': 'auto_fuel_type=6'},
+        'color': {
+            'black': 'auto_paint=1',
+            'blue': 'auto_paint=2',
+            'brown': 'auto_paint=20',
+            'green': 'auto_paint=3',
+            'grey': 'auto_paint=4',
+            'orange': 'auto_paint=5',
+            'purple': 'auto_paint=6',
+            'red': 'auto_paint=7',
+            'silver': 'auto_paint=8',
+            'white': 'auto_paint=9',
+            'yellow': 'auto_paint=10',
+            'custom': 'auto_paint=11'},
+        'size': {
+            'compact': 'auto_size=1',
+            'full-size': 'auto_size=2',
+            'mid-size': 'auto_size=3',
+            'sub-compact': 'auto_size=4'},
+        'title-status': {
+            'clean': 'auto_title_status=1',
+            'salvage': 'auto_title_status=2',
+            'rebuilt': 'auto_title_status=3',
+            'parts-only': 'auto_title_status=4',
+            'lien': 'auto_title_status=5',
+            'missing': 'auto_title_status=6'},
+        'transmission': {
+            'manual': 'auto_transmission=1',
+            'automatic': 'auto_transmission=2',
+            'other': 'auto_transmission=3'},
+        'type': {
+            'bus': 'auto_bodytype=1',
+            'convertible': 'auto_bodytype=2',
+            'coupe': 'auto_bodytype=3',
+            'hatchback': 'auto_bodytype=4',
+            'mini-van': 'auto_bodytype=5',
+            'offroad': 'auto_bodytype=6',
+            'pickup': 'auto_bodytype=7',
+            'sedan': 'auto_bodytype=8',
+            'truck': 'auto_bodytype=9',
+            'SUV': 'auto_bodytype=10',
+            'wagon': 'auto_bodytype=11',
+            'van': 'auto_bodytype=12',
+            'other': 'auto_bodytype=13'},
+
+    }
+    var_opt = {
+        'search_distance': 'search_distance',
+        'postal_code': 'postal',
+        'min_price': 'min_price',
+        'max_price': 'max_price',
+        'min_auto_year': 'min_auto_year',
+        'max_auto_year': 'max_auto_year',
+        'min_miles': 'min_auto_miles',
+        'max_miles': 'max_auto_miles'
+    }
+
+    def __init__(self, static, var):
+        """
+        :param static: list of strings and 2-tuples, options whose value is static
+        :param var: list of 2-tuples, each list element is made of option
+                    and the variable option amount
+        """
+        self.static = static
+        self.var = var
+        self.options = self.list_builder()
+
+    @staticmethod
+    def opt_builder(option, amount):
+        return f'{option}={amount}'
+
+    @property
+    def options_list(self):
+        return self.options
+
+    def list_builder(self):
+        """
+        :return: list of search options
+        """
+        options = []
+        for option in self.static:
+            if option in self.flat_static:
+                options.append(self.flat_static[option])
+
+            else:
+                try:
+                    opt, value = option
+                    if opt in self.nested_static:
+                        options.append(self.nested_static[opt][value])
+                except ValueError as e:
+                    print(f'Error: {e}.  \nPassing')
+
+        for option in self.var:
+            try:
+                opt, amount = option
+                if opt in self.var_opt:
+                    options.append(self.opt_builder(opt, amount))
+            except ValueError as e:
+                print(f'Error: {e}. \nPassing')
+        return options

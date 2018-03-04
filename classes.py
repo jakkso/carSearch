@@ -13,6 +13,9 @@ from config import Config
 
 class Database:
     def __init__(self, database):
+        """
+        :param database: string, path to sqlite db file
+        """
         self.database = database
         self.conn = sqlite3.connect(self.database)
         self.c = self.conn.cursor()
@@ -53,9 +56,8 @@ class Database:
 class Feed:
     def __init__(self, url, dict_file):
         """
-
         :param url: string, RSS feed URL
-        :param dict_file: a pickled dict file.
+        :param dict_file: string, path to a pickled dict file.
         """
         self.url = url
         self.dict_file = dict_file
@@ -166,3 +168,63 @@ class Message:
         server.login(user=Config.sender, password=Config.pwd)
         server.sendmail(Config.sender, self.email_address, msg.as_string())
         server.quit()
+
+
+class Url:
+
+    def __init__(self, city, category, item_name):
+        """
+        :param city: string, city / geographical area for craigslist.
+        # TODO add in validation for cities (Dict of all NA CL cities?)
+        :param category: string, for sale category abbreviation
+        # TODO validate categories as well
+        """
+        assert(city is not None and city.strip() != '')
+        assert(category is not None and category.strip() != '')
+        assert(item_name is not None and item_name.strip() != '')
+
+        self.city = city.strip()
+        self.category = category.strip()
+        self.item_name = self.item_name_maker(item_name)
+
+        self.url = f'https://{city}.craigslist.org/search/{category}?' \
+                   f'format=rss&searchNearby=1'
+
+    def __repr__(self):
+        return f'Url({self.city}, {self.category}, {self.item_name})'
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    @staticmethod
+    def item_name_maker(item_name):
+        return '+'.join(item_name.split())
+
+
+class CarTruck(Url):
+
+    def __init__(self, city, category, item_name, *options):
+        """
+        :param city: string, city / geographical area for craigslist.
+        :param category: string, for sale category abbreviation
+        :param item_name: string, item for which user is searching
+        :param options: list, search parameters
+        """
+        Url.__init__(self, city, category, item_name)
+        assert item_name is not None
+
+        self.options = options
+        self.url = self.url_maker()
+
+    def __repr__(self):
+        return f'CarTruck({self.city}, {self.category}, {self.item_name}, *{self.options})'
+
+    def url_maker(self):
+        opt = '&'.join([self.url, '&'.join(self.options)])
+        if self.item_name.strip() != '':
+            return opt + f'&auto_make_model={self.item_name}'
+        else:
+            return opt

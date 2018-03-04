@@ -16,7 +16,7 @@ class Base(unittest.TestCase):
         self.assertEqual(type(obj1), type(obj2))
 
 
-class TestDatabase(Base):
+class TestStorage(Base):
 
     def setUp(self):
         classes.Database.init_database(DATABASE)
@@ -66,11 +66,65 @@ class TestDatabase(Base):
         feed = classes.Feed(URL, DICT_FILE).load_dict()
         self.assertEqual(feed, test_dict)
 
-    def test_refresh_feed(self):
+    def stest_refresh_feed(self):
         feed = classes.Feed(URL, DICT_FILE).refresh_feed()
         self.assertGreater(len(feed), 0)
         feed = classes.Feed(URL, DICT_FILE).refresh_feed()
         self.assertEqual(len(feed), 0)
+
+
+class TestUrl(Base):
+
+    def test_url_magic_methods(self):
+        denver = classes.Url('Denver', 'cta', 'beetle')
+        self.assertEqual(denver.__repr__(), 'Url(Denver, cta, beetle)')
+        with classes.Url('Denver', 'cta', 'beetle') as denver:
+            self.assertEqual(denver.city, 'Denver')
+
+    def test_url_init(self):
+        failures = ['', ' ', None]
+
+        for failure in failures:
+            with self.assertRaises(AssertionError):
+                classes.Url(failure, 'cta', 'beetle')
+                classes.Url('denver', failure, 'beetle')
+                classes.Url('denver', 'cta', failure)
+
+        self.assertEqual('denver', classes.Url('denver ', 'cta', 'beetle').city)
+        self.assertEqual('cta', classes.Url('denver', 'cta ', 'beetle').category)
+        self.assertEqual('GTI', classes.Url('denver', 'cta', 'GTI ').item_name)
+        self.assertEqual('volkswagen+GTI', classes.Url('denver', 'cta',
+                                                       'volkswagen GTI').item_name)
+
+    def test_cartruck_init(self):
+        opt = ['max_price=20000', 'auto_transmission=1']
+        with self.assertRaises(AssertionError):
+            classes.CarTruck('denver', 'cta', None, *opt)
+
+    def test_cartruck_magic_methods(self):
+        opt = ['max_price=20000', 'auto_transmission=1']
+        denver = classes.CarTruck('denver', 'cta', 'GTI', *opt)
+        self.assertEqual(denver.__repr__(), "CarTruck(denver, cta, GTI, *('max"
+                                            "_price=20000', 'auto_transmission"
+                                            "=1'))")
+        with classes.CarTruck('denver', 'cta', 'GTI', *opt) as denver:
+            self.assertEqual('denver', denver.city)
+
+    def test_url_maker(self):
+        opt = ['max_price=20000', 'auto_transmission=1']
+        denver = classes.CarTruck('denver', 'cta', 'GTI', *opt)
+        self.assertEqual(denver.url, 'https://denver.craigslist.org/search/cta'
+                                     '?format=rss&searchNearby=1&max_price=200'
+                                     '00&auto_transmission=1&auto_make_model=GTI')
+        denver = classes.CarTruck('denver', 'cta', 'GTI ', *opt)
+        self.assertEqual(denver.url, 'https://denver.craigslist.org/search/cta'
+                                     '?format=rss&searchNearby=1&max_price=200'
+                                     '00&auto_transmission=1&auto_make_model=GTI')
+        denver = classes.CarTruck('denver', 'cta', 'volkswagen GTI', *opt)
+        self.assertEqual(denver.url, 'https://denver.craigslist.org/search/cta'
+                                     '?format=rss&searchNearby=1&max_price=200'
+                                     '00&auto_transmission=1&auto_make_model=v'
+                                     'olkswagen+GTI')
 
 
 if __name__ == '__main__':

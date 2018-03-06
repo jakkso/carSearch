@@ -73,7 +73,7 @@ class TestStorage(Base):
         self.assertEqual(len(feed), 0)
 
 
-class TestUrl(Base):
+class TestVehicle(Base):
 
     def test_url_magic_methods(self):
         denver = classes.Url('Denver', 'cta', 'beetle')
@@ -82,61 +82,48 @@ class TestUrl(Base):
             self.assertEqual(denver.city, 'Denver')
 
     def test_url_init(self):
-        failures = ['', ' ', None]
-
-        for failure in failures:
-            with self.assertRaises(AssertionError):
-                classes.Url(failure, 'cta', 'beetle')
-                classes.Url('denver', failure, 'beetle')
-                classes.Url('denver', 'cta', failure)
-
         self.assertEqual('denver', classes.Url('denver ', 'cta', 'beetle').city)
         self.assertEqual('cta', classes.Url('denver', 'cta ', 'beetle').category)
-        self.assertEqual('GTI', classes.Url('denver', 'cta', 'GTI ').item_name)
+        self.assertEqual('GTI', classes.Url('denver', 'cta', 'GTI ').search_term)
         self.assertEqual('volkswagen+GTI', classes.Url('denver', 'cta',
-                                                       'volkswagen GTI').item_name)
+                                                       'volkswagen GTI').search_term)
 
-    def test_cartruck_init(self):
+    def test_vehicle_magic_methods(self):
         opt = ['max_price=20000', 'auto_transmission=1']
-        with self.assertRaises(AssertionError):
-            classes.CarTruck('denver', 'cta', None, *opt)
-
-    def test_cartruck_magic_methods(self):
-        opt = ['max_price=20000', 'auto_transmission=1']
-        denver = classes.CarTruck('denver', 'cta', 'GTI', *opt)
-        self.assertEqual(denver.__repr__(), "CarTruck(denver, cta, GTI, *('max"
+        denver = classes.Vehicle('denver', 'cta', opt, 'GTI')
+        self.assertEqual(denver.__repr__(), "Vehicle(denver, cta, ['max"
                                             "_price=20000', 'auto_transmission"
-                                            "=1'))")
-        with classes.CarTruck('denver', 'cta', 'GTI', *opt) as denver:
+                                            "=1'], GTI)")
+        with classes.Vehicle('denver', 'cta', opt, 'GTI') as denver:
             self.assertEqual('denver', denver.city)
 
     def test_url_maker(self):
         opt = ['max_price=20000', 'auto_transmission=1']
-        denver = classes.CarTruck('denver', 'cta', 'GTI', *opt)
+        denver = classes.Vehicle('denver', 'cta', opt, 'GTI')
         self.assertEqual(denver.url, 'https://denver.craigslist.org/search/cta'
                                      '?format=rss&searchNearby=1&max_price=200'
                                      '00&auto_transmission=1&auto_make_model=G'
                                      'TI')
-        denver = classes.CarTruck('denver', 'cta', 'GTI ', *opt)
+        denver = classes.Vehicle('denver', 'cta', opt, 'GTI ')
         self.assertEqual(denver.url, 'https://denver.craigslist.org/search/cta'
                                      '?format=rss&searchNearby=1&max_price=200'
                                      '00&auto_transmission=1&auto_make_model=G'
                                      'TI')
-        denver = classes.CarTruck('denver', 'cta', 'volkswagen GTI', *opt)
+        denver = classes.Vehicle('denver', 'cta', opt, 'volkswagen GTI')
         self.assertEqual(denver.url, 'https://denver.craigslist.org/search/cta'
                                      '?format=rss&searchNearby=1&max_price=200'
                                      '00&auto_transmission=1&auto_make_model=v'
                                      'olkswagen+GTI')
-        denver = classes.CarTruck('denver', 'cta', 'GTI', [])
+        denver = classes.Vehicle('denver', 'cta', [], 'GTI')
         self.assertEqual(denver.url, 'https://denver.craigslist.org/search/cta'
                                      '?format=rss&searchNearby=1&auto_make_mod'
                                      'el=GTI')
-        denver = classes.CarTruck('denver', 'cta', 'GTI', ['auto_transmission=1'])
+        denver = classes.Vehicle('denver', 'cta', ['auto_transmission=1'], 'GTI')
         self.assertEqual(denver.url, 'https://denver.craigslist.org/search/cta'
                                      '?format=rss&searchNearby=1&auto_transmis'
                                      'sion=1&auto_make_model=GTI')
 
-    def test_ctoptions(self):
+    def test_vehicle_options(self):
         static = [
             'posted_today',
             'has_images',
@@ -151,7 +138,7 @@ class TestUrl(Base):
             ('max_price', 20000),
             ('max_miles', 30000)
         ]
-        options = classes.CTOptions(static, var).options_list
+        options = classes.VehicleOptions(static, var).options_list
         test_value = ['postToday=1', 'hasPic=1', 'auto_size=1', 'auto_bodytype=1',
                       'min_auto_year=2015', 'postal_code=80537', 'search_distance=500',
                       'max_price=20000', 'max_miles=30000']
@@ -160,23 +147,23 @@ class TestUrl(Base):
         static.append('nonsense Value')
         var.append(('pfft', 200))
         var.append('pfft')
-        options = classes.CTOptions(static, var).options_list
+        options = classes.VehicleOptions(static, var).options_list
         self.assertEqual(test_value, options)
 
         static = []
         test_value = ['min_auto_year=2015', 'postal_code=80537', 'search_distance=500',
                       'max_price=20000', 'max_miles=30000']
-        options = classes.CTOptions(static, var).options_list
+        options = classes.VehicleOptions(static, var).options_list
         self.assertEqual(test_value, options)
 
         var = []
         test_value = []
-        options = classes.CTOptions(static, var).options_list
+        options = classes.VehicleOptions(static, var).options_list
         self.assertEqual(test_value, options)
 
         static = ['has_images']
         test_value = ['hasPic=1']
-        options = classes.CTOptions(static, var).options_list
+        options = classes.VehicleOptions(static, var).options_list
         self.assertEqual(options, test_value)
 
 

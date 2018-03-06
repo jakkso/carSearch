@@ -172,26 +172,29 @@ class Message:
 
 class Url:
 
-    def __init__(self, city, category, item_name):
+    def __init__(self, city, category, search_term=None):
         """
         :param city: string, city / geographical area for craigslist.
         # TODO add in validation for cities (Dict of all NA CL cities?)
         :param category: string, for sale category abbreviation
         # TODO validate categories as well
         """
-        assert(city is not None and city.strip() != '')
-        assert(category is not None and category.strip() != '')
-        assert(item_name is not None)
+        # assert(city is not None and city.strip() != '')
+        # assert(category is not None and category.strip() != '')
+        # assert(search_term is not None)
 
-        self.city = city.strip()
+        self.city = city.replace(' ', '')
         self.category = category.strip()
-        self.item_name = '+'.join(item_name.split())
+        if search_term is not None:
+            self.search_term = '+'.join(search_term.split())
+        else:
+            self.search_term = None
 
         self.url = f'https://{city}.craigslist.org/search/{category}?' \
                    f'format=rss&searchNearby=1'
 
     def __repr__(self):
-        return f'Url({self.city}, {self.category}, {self.item_name})'
+        return f'Url({self.city}, {self.category}, {self.search_term})'
 
     def __enter__(self):
         return self
@@ -200,51 +203,56 @@ class Url:
         pass
 
 
-class CarTruck(Url):
+class Vehicle:
 
-    def __init__(self, city, category, item_name, *options):
+    def __init__(self, city, category, options, term=None):
         """
         :param city: string, city / geographical area for craigslist.
         :param category: string, for sale category abbreviation
-        :param item_name: string, item for which user is searching
+        :param term: string, item for which user is searching
         :param options: list, search parameters
         """
-        Url.__init__(self, city, category, item_name)
-        assert item_name is not None
+        self.city = city.replace(' ', '')
+        self.category = category
+        self.options = options
+        self.term = self.search_parser(term)
+        self.base_url = f'https://{self.city}.craigslist.org/search/' \
+                        f'{self.category}?format=rss&searchNearby=1'
+        self.url = self.url_parser()
 
-        self.options = self.options_maker(options)
-        self.url = self.url_maker()
+    def __repr__(self):
+        return f'Vehicle({self.city}, {self.category}, {self.options}, {self.term})'
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
 
     @property
     def get_url(self):
         return self.url
 
-    def __repr__(self):
-        return f'CarTruck({self.city}, {self.category}, {self.item_name}, *{self.options})'
-
     @staticmethod
-    def options_maker(options):
-        if len(options) > 1:
-            return options
-        elif len(options) == 1 and options[0] != [] and options[0][0].strip() != '':
-            return options[0]
+    def search_parser(term):
+        if term is None:
+            return
         else:
-            return []
+            return '+'.join(term.split())
 
-    def url_maker(self):
-        if len(self.options) > 1:
-            opt = '&'.join([self.url, '&'.join(self.options)])
-        elif len(self.options) == 1 and self.options[0] != []:
-            opt = f'{self.url}&{self.options[0]}'
+    def url_parser(self):
+        if len(self.options) > 0:
+            url = '&'.join([self.base_url, '&'.join(self.options)])
         else:
-            opt = self.url
-        if self.item_name != '':
-            return opt + f'&auto_make_model={self.item_name}'
+            url = self.base_url
+
+        if self.term is not None:
+            return f'{url}&auto_make_model={self.term}'
         else:
-            return opt
+            return url
 
 
-class CTOptions:
+class VehicleOptions:
     flat_static = {
         'crypto': 'crypto_currency_ok=1',
         'posted_today': 'postToday=1',
